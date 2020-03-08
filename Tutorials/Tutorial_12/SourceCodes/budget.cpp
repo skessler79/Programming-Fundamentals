@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 using namespace std;
 
 const int NAMESIZE = 15;
@@ -29,41 +30,65 @@ int main()
 	fstream indata;
 	ofstream outdata;	// output file of
 						// student. 
-
-	indata.open("income.dat", ios::out | ios::binary);	// open file as binary
-														// output.
+	vector<budget> records;
 
 	outdata.open("student.out");	// output file that we
-									// will write student
-									// information to. 
+								// will write student
+								// information to. 
 
-	outdata << left << fixed << setprecision(2);	// left indicates left
-													// justified for fields 
+	char next = 'Y';
+	do
+	{
+		indata.open("income.dat", ios::out | ios::binary);	// open file as binary
+														// output.
 
-	budget person;	// defines person to be a record
+		outdata << left << fixed << setprecision(2);	// left indicates left
+														// justified for fields 
 
-	cout << "Enter the following information" << endl;
+		budget person;	// defines person to be a record
 
-	cout << "Person's name: ";
-	cin.getline(person.name, NAMESIZE);
+		cout << "Enter the following information" << endl;
 
-	cout << "Income :";
-	cin >> person.income;
+		cout << "Person's name: ";
+		cin.getline(person.name, NAMESIZE);
 
-	// FILL IN CODE TO READ IN THE REST OF THE FIELDS:
-	// rent, food, utilities AND miscell TO THE person RECORD
+		cout << "Income :";
+		cin >> person.income;
 
-	// find the net field
-	person.net = // FILL IN CODE TO DETERMINE NET INCOME (income - expenses)
+		// FILL IN CODE TO READ IN THE REST OF THE FIELDS:
+		// rent, food, utilities AND miscell TO THE person RECORD
+		cout << "Rent :";
+		cin >> person.rent;
 
-	// write this record to the file
-	// Fill IN CODE TO WRITE THE RECORD TO THE FILE indata (one instruction)
+		cout << "Food :";
+		cin >> person.food;
 
-	indata.close();
+		cout << "Utilities :";
+		cin >> person.utilities;
 
-	// FILL IN THE CODE TO REOPEN THE indata FILE, NOW AS AN INPUT FILE.
+		cout << "Miscellaneous :";
+		cin >> person.miscell;
 
-	// FILL IN THE CODE TO READ THE RECORD FROM indata AND PLACE IT IN THE
+		// find the net field
+		person.net = person.income - person.rent - person.food - person.utilities - person.miscell;
+	// FILL IN CODE TO DETERMINE NET INCOME (income - expenses)
+
+		// write this record to the file
+		// Fill IN CODE TO WRITE THE RECORD TO THE FILE indata (one instruction)
+		indata.write(reinterpret_cast<char *> (&person), sizeof(person));
+
+		indata.close();
+
+		// FILL IN THE CODE TO REOPEN THE indata FILE, NOW AS AN INPUT FILE.
+		indata.open("income.dat", ios::in | ios::binary);
+
+		// FILL IN THE CODE TO READ THE RECORD FROM indata AND PLACE IT IN THE
+		indata.read(reinterpret_cast<char *> (&person.net), sizeof(person.net));
+
+		records.push_back(person);
+		cout << "Enter Y to input more data\n";
+		cin >> next;
+	}while(next == 'Y');
 
 	// write information to output file
 	outdata << setw(20) << "Name" << setw(10) << "Income" << setw(10) << "Rent"
@@ -72,6 +97,12 @@ int main()
 
 	// FILL IN CODE TO WRITE INDIVIDUAL FIELD INFORMATION OF THE RECORD TO
 	// THE outdata FILE.(several instructions)
-
+	for(int i = 0; i < records.size(); i++)
+	{
+		outdata << setw(20) << records[i].name << setw(10) << records[i].income << setw(10) << records[i].rent
+			    << setw(10) << records[i].food << setw(15) << records[i].utilities << setw(15)
+			    << records[i].miscell << setw(10) << records[i] << endl;
+	}
+	
 	return 0;
 }
